@@ -82,7 +82,10 @@ public:
 	{
 		cl::ignore( to );
 		cl::ignore( color );
-		min_ellipse_ = cv::fitEllipse( cv::Mat( contour_ ) );
+		if(contour_.size() >= 5)
+		{
+			min_ellipse_ = cv::fitEllipse( cv::Mat( contour_ ));
+		}
 		//ellipse( to, min_ellipse_, color, 1, CV_AA );
 	}
 
@@ -90,7 +93,11 @@ public:
 	{
 		for( const auto& point : contour_ )
 		{
-			if( point.y == 1 || point.y == 374 - 2 )
+			if( point.y <= 2 || point.y >= 478 )
+			{
+				return true;
+			}
+			if( point.x <= 2 || point.y >= 750 )
 			{
 				return true;
 			}
@@ -151,6 +158,8 @@ public:
 
 	cv::Point2i get_estimated_position( const cv::Point2i& measured_position );
 
+	cv::Point2i get_position();
+
 	bool has_polygon();
 
 	bool is_in_ellipse( const cv::RotatedRect& ellipse );
@@ -175,6 +184,7 @@ public:
 	bool has_polygon_;
 	uint32_t lost_count_;
 	uint32_t index_;
+	cv::Point2i corrected_position_;
 
 	cv::RotatedRect ellipse_;
 };

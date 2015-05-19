@@ -36,6 +36,7 @@
 //
 ObjectTracker::ObjectTracker()
 	: predicted_position_{ }
+	, corrected_position_{ }
 	, kalman_filter_{ 4, 2, 0 }
 	, measurement_{ 2, 1 }
 	, ellipses_{ 50 }
@@ -69,9 +70,9 @@ ObjectTracker::initialize( const cv::Point2i& measured_position, uint32_t index 
 	kalman_filter_.statePre.at< float >( 2 ) = 0.0;
 	kalman_filter_.statePre.at< float >( 3 ) = 0.0;
 	setIdentity( kalman_filter_.measurementMatrix );
-	setIdentity( kalman_filter_.processNoiseCov, cv::Scalar::all( 1e-4 ) );
+	setIdentity( kalman_filter_.processNoiseCov, cv::Scalar::all( 5e-2 ) );
 	setIdentity( kalman_filter_.measurementNoiseCov, cv::Scalar::all( 1e-1 ) );
-	setIdentity( kalman_filter_.errorCovPost, cv::Scalar::all( .1 ) );
+	setIdentity( kalman_filter_.errorCovPost, cv::Scalar::all( 1e-1 ) );
 
 	index_ = index;
 }
@@ -107,8 +108,18 @@ ObjectTracker::get_estimated_position( const cv::Point2i& measured_position )
 	// The "correct" phase that is going to use the predicted value and our measurement
 	cv::Mat estimated = kalman_filter_.correct( measurement_ );
 	cv::Point2f statePt( estimated.at< float >( 0 ), estimated.at< float >( 1 ) );
+	corrected_position_ = cv::Point2i( cl::math::RoundToLong( statePt.x ),
+	                                   cl::math::RoundToLong( statePt.y ));
 
 	return cv::Point2i{ cl::math::RoundToLong( statePt.x ), cl::math::RoundToLong( statePt.y ) };
+}
+
+//-------------------------------------------------------------------------------------------------
+//
+cv::Point2i
+ObjectTracker::get_position()
+{
+	return corrected_position_;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -192,3 +203,4 @@ ObjectTracker::update_mean_ellipse( const cv::RotatedRect& ellipse, cv::Point2i 
 
 	ellipse_ = cv::RotatedRect( p, mean_size, mean_angle );
 }
+

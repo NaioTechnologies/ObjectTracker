@@ -26,6 +26,7 @@ project( objectTracker )
 set( CMAKE_MODULE_PATH  ${PROJECT_SOURCE_DIR}/cmake/modules )
 find_package( LOKI			1.0.7	REQUIRED )
 find_package( VITALS		0.4.0	REQUIRED )
+find_package( ROBBIE		0.3.0	REQUIRED )
 find_package( OpenCV		2.4.5	REQUIRED )
 
 
@@ -60,6 +61,7 @@ set( EXECUTABLE_SOURCES
 	${SOURCE_DIR}/ObjectTracker.cpp
 	${SOURCE_DIR}/Finder.cpp
 	${SOURCE_DIR}/Histogram.cpp
+	${SOURCE_DIR}/SaladDetector.cpp
 )
 
 
@@ -177,6 +179,7 @@ add_executable( ${PROJECT_NAME} ${EXECUTABLE_SOURCES} )
 target_include_directories( ${PROJECT_NAME} SYSTEM PUBLIC
 	${OpenCV_INCLUDE_DIRS}
 	${VITALS_INCLUDE_DIRS}
+	${ROBBIE_INCLUDE_DIRS}
 )
 
 
@@ -189,6 +192,7 @@ target_link_libraries( ${PROJECT_NAME}
 
 	${OpenCV_LIBRARIES}
 	${VITALS_LIBRARIES}
+	${ROBBIE_LIBRARIES}
 )
 
 if( CMAKE_BUILD_TYPE STREQUAL "Debug" )
